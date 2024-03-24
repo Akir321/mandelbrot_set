@@ -21,7 +21,7 @@ OBJECTS = $(OBJ_DIR)main.o          \
 all: mandelbrot
 
 mandelbrot: $(OBJECTS)
-	$(CXX) $(OBJECTS) -o $@ -L/usr/lib -lSDL2
+	$(CXX) -O3 $(OBJECTS) -o $@ -L/usr/lib -lSDL2
 
 $(OBJ_DIR)main.o:          $(SRC_DIR)main.cpp
 	$(CXX) -c $< -o $@ $(CXX_FLAGS)
@@ -30,7 +30,7 @@ $(OBJ_DIR)work_with_SDL.o: $(SRC_DIR)work_with_SDL.cpp $(SRC_DIR)work_with_SDL.h
 	$(CXX) -c $< -o $@ $(CXX_FLAGS)
 
 $(OBJ_DIR)mandelbrot.o:    $(SRC_DIR)mandelbrot.cpp    $(SRC_DIR)mandelbrot.h
-	$(CXX) -c $< -o $@ $(CXX_FLAGS)
+	$(CXX) -c $< -o $@ $(CXX_FLAGS) -mfma -mavx2 -mf16c
 
 $(OBJ_DIR)html_logfile.o:  $(SRC_DIR)html_logfile.cpp  $(SRC_DIR)html_logfile.h
 	$(CXX) -c $< -o $@ $(CXX_FLAGS)

@@ -13,7 +13,5 @@ enum ErrorsSDL
 int initializeSDL(SDL_Window **window, SDL_Renderer **renderer, int width, int height);
 int quitSDL      (SDL_Window **window, SDL_Renderer **renderer);
 
-void printPoint(SDL_Renderer *renderer,
-               int x, int y, int N);
 
 #endif //__WORK_WITH_SDL_H__

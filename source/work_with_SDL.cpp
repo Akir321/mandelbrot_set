@@ -56,29 +56,3 @@ int quitSDL(SDL_Window **window, SDL_Renderer **renderer)
 
     return EXIT_SUCCESS;
 }
-
-
-#define BYTE char
-
-void printPoint(SDL_Renderer *renderer,
-               int x, int y, int N)
-{
-    float I = sqrtf((float)N / (float)MaxPointN) * 255.f;
-    
-    BYTE c = (BYTE) I;
-
-    if (N >= MaxPointN) SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-
-    else                SDL_SetRenderDrawColor(renderer, 
-                                               (BYTE)(255 - c), (BYTE)(c%2 * 64),
-                                                c , SDL_ALPHA_OPAQUE);
-
-
-    if (N >= MaxPointN) {LOG("r = 0, g = 0, b = 0\n");}
-    else                {LOG("r = %d, g = %d, b = %d\n", (BYTE)(255 - c), 
-                                                        (BYTE)(c%2 * 64), c);}
-
-    SDL_RenderDrawPoint(renderer, x, y);
-}
-
-#undef BYTE
