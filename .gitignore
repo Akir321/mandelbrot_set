@@ -32,3 +32,6 @@
 *.app
 
 mandelbrot
+
+# Logs
+*.html

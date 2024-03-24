@@ -10,11 +10,30 @@ CXX_FLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-
 
 SRC_DIR = source/
 
+OBJ_DIR = object/
 
+OBJECTS = $(OBJ_DIR)main.o          \
+          $(OBJ_DIR)work_with_SDL.o \
+		  $(OBJ_DIR)mandelbrot.o    \
+		  $(OBJ_DIR)html_logfile.o
+
+		  
 all: mandelbrot
 
-mandelbrot:
-	$(CXX) $(SRC_DIR)main.cpp $(SRC_DIR)work_with_SDL.cpp $(SRC_DIR)mandelbrot.cpp -o $@ -L/usr/lib -lSDL2
+mandelbrot: $(OBJECTS)
+	$(CXX) $(OBJECTS) -o $@ -L/usr/lib -lSDL2
+
+$(OBJ_DIR)main.o:          $(SRC_DIR)main.cpp
+	$(CXX) -c $< -o $@ $(CXX_FLAGS)
+
+$(OBJ_DIR)work_with_SDL.o: $(SRC_DIR)work_with_SDL.cpp $(SRC_DIR)work_with_SDL.h
+	$(CXX) -c $< -o $@ $(CXX_FLAGS)
+
+$(OBJ_DIR)mandelbrot.o:    $(SRC_DIR)mandelbrot.cpp    $(SRC_DIR)mandelbrot.h
+	$(CXX) -c $< -o $@ $(CXX_FLAGS)
+
+$(OBJ_DIR)html_logfile.o:  $(SRC_DIR)html_logfile.cpp  $(SRC_DIR)html_logfile.h
+	$(CXX) -c $< -o $@ $(CXX_FLAGS)
 
 clean:
-	rm mandelbrot
+	rm mandelbrot $(OBJ_DIR)*.o

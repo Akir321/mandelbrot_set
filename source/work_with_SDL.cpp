@@ -4,8 +4,12 @@
 #include <SDL2/SDL.h>
 
 #include "work_with_SDL.h"
+#include "html_logfile.h"
 
 const int MaxPointN = 256;
+
+#undef  LOG
+#define LOG(...) 
 
 
 int initializeSDL(SDL_Window **window, SDL_Renderer **renderer, int width, int height)
@@ -68,6 +72,11 @@ void printPoint(SDL_Renderer *renderer,
     else                SDL_SetRenderDrawColor(renderer, 
                                                (BYTE)(255 - c), (BYTE)(c%2 * 64),
                                                 c , SDL_ALPHA_OPAQUE);
+
+
+    if (N >= MaxPointN) {LOG("r = 0, g = 0, b = 0\n");}
+    else                {LOG("r = %d, g = %d, b = %d\n", (BYTE)(255 - c), 
+                                                        (BYTE)(c%2 * 64), c);}
 
     SDL_RenderDrawPoint(renderer, x, y);
 }
