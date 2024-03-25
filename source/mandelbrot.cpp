@@ -14,15 +14,20 @@ const int MaxPointN    = 256;
 
 const int NumsInVector = 8;
 
+const float changeMult = 10.f;
+
 const float dx         = 1.f / WindowWidth;
 const float dy         = 1.f / WindowHeight;
+
+const float dChangeX   = dx * changeMult;
+const float dChangeY   = dy * changeMult;
 
 const float Radius2Max = 100.f;
 
 const float CenterX    =  -1.325f;
 const float CenterY    =  0.f;
 
-const float changeMult = 10.f;
+const float epsilon    = 1e-6f;
 
 const __m256 NMaxes = _mm256_set1_ps(MaxPointN);
 const __m256 r2Max  = _mm256_set1_ps(Radius2Max);
@@ -40,6 +45,8 @@ static inline __m256i calculateNOf8Points(__m256 X0,  __m256 Y0);
 
 static inline void    print8Points(SDL_Renderer *renderer,
                                    int x, int y, __m256i N);
+
+static bool fIsZero(float a);
 
 
 int printMandelbrotSet()
@@ -79,21 +86,24 @@ static void printSetToWindow(SDL_Window *window, SDL_Renderer *renderer)
             {
                 switch(event.key.keysym.sym)
                 {
-                    case SDLK_ESCAPE:   repeat         = false;           break;
+                    case SDLK_ESCAPE:   repeat         = false;    break;
 
-                    case SDLK_UP:       data.shiftY   -= dy * changeMult; break;
+                    case SDLK_UP:       data.shiftY   -= dChangeY; break;
 
-                    case SDLK_DOWN:     data.shiftY   += dy * changeMult; break;
+                    case SDLK_DOWN:     data.shiftY   += dChangeY; break;
 
-                    case SDLK_RIGHT:    data.shiftX   += dx * changeMult; break;
+                    case SDLK_RIGHT:    data.shiftX   += dChangeX; break;
 
-                    case SDLK_LEFT:     data.shiftX   -= dx * changeMult; break;
+                    case SDLK_LEFT:     data.shiftX   -= dChangeX; break;
                                     
-                    case SDLK_z:        data.zoomMult -= dx * changeMult; break;
+                    case SDLK_z:        data.zoomMult -= dChangeX;
+                                        if (fIsZero(data.zoomMult)) 
+                                            data.zoomMult = dChangeX;
+                                                                   break;
 
-                    case SDLK_x:        data.zoomMult += dx * changeMult; break;
+                    case SDLK_x:        data.zoomMult += dChangeX; break;
 
-                    default:                                              break;
+                    default:                                       break;
                 }
             }
         }
@@ -193,3 +203,8 @@ static inline void print8Points(SDL_Renderer *renderer,
 }
 
 #undef BYTE
+
+static bool fIsZero(float a)
+{
+    return fabs(a) < epsilon;
+}
