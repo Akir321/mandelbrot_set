@@ -91,7 +91,7 @@ static void printSetToWindow(SDL_Window *window, SDL_Renderer *renderer)
                                     
                     case SDLK_z:        data.zoomMult -= dx * changeMult; break;
 
-                    case SDLK_o:        data.zoomMult += dx * changeMult; break;
+                    case SDLK_x:        data.zoomMult += dx * changeMult; break;
 
                     default:                                              break;
                 }
@@ -110,21 +110,21 @@ static void calculateSet(SDL_Renderer *renderer, const CoordData *data)
 {
     const __m256 _76543210 = _mm256_set_ps (7.f, 6.f, 5.f, 4.f, 3.f, 2.f, 1.f, 0.f);
 
+    float NumDxZoomed = NumsInVector * dx * data->zoomMult;
+
     for (int curY = 0; curY < WindowHeight; curY++)
     {
-        float NumDxZoomed = NumsInVector * dx * data->zoomMult;
+        float x0 = ( (            - WindowWidth  / 2.f) * dx ) * data->zoomMult +
+                    CenterX + data->shiftX;
 
-        float x0 = ( (            - WindowWidth  / 2.f) * dx + data->shiftX ) * 
-                        data->zoomMult + CenterX;
-
-        float y0 = ( ((float)curY - WindowHeight / 2.f) * dy + data->shiftY ) * 
-                        data->zoomMult + CenterY;
+        float y0 = ( ((float)curY - WindowHeight / 2.f) * dy ) * data->zoomMult +
+                    CenterY + data->shiftY;
 
 
         for (int curX = 0; curX < WindowWidth; curX += NumsInVector, x0 += NumDxZoomed)
         {
-            __m256 X0 = _mm256_fmadd_ps(_mm256_set1_ps(x0), _76543210,
-                                        _mm256_set1_ps(dx));
+            __m256 X0 = _mm256_fmadd_ps(_mm256_set1_ps(dx), _76543210,
+                                        _mm256_set1_ps(x0));
 
             __m256 Y0 = _mm256_set1_ps(y0);
 
