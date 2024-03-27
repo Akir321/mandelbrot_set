@@ -13,7 +13,22 @@ const float changeMult = 5.f;
 const float dChangeX   = dx * changeMult;
 const float dChangeY   = dy * changeMult;
 
+
+#define TIME_MEASURE
+
+
+#ifdef TIME_MEASURE
+
+const int NumOfRuns = 250;
+
+static inline uint64_t getProcessorTime();
+
+#else
+
 static void pollAllSDLEvents(bool *setIsOn, CoordData *data);
+
+#endif
+
 
 static void printSetToWindow(SDL_Window *window, SDL_Renderer *renderer);
 
@@ -48,6 +63,30 @@ static void printSetToWindow(SDL_Window *window, SDL_Renderer *renderer)
     data.shiftY    = 0;
     data.zoomMult  = 1.f;
 
+#ifdef TIME_MEASURE
+
+    uint64_t begin = getProcessorTime();
+
+    for (int runsCnt = 1; runsCnt <= NumOfRuns; runsCnt++)
+    {
+        SDL_RenderClear(renderer);
+
+        calculateSet(renderer, &data);
+        if (runsCnt % 50 == 0) 
+            printf("performed %d runs\n", runsCnt);
+
+        SDL_RenderPresent(renderer);
+    }
+
+    uint64_t result = getProcessorTime() - begin;
+
+    printf("Measurement is in processor ticks\n");
+    printf("cycles performed: %d\n", NumOfRuns);
+    printf("the result:       %ld\n", result);
+    printf("time per cycle:   %ld\n", result / NumOfRuns);
+
+#else
+
     bool setIsOn    = true;
 
     while (setIsOn)
@@ -60,7 +99,13 @@ static void printSetToWindow(SDL_Window *window, SDL_Renderer *renderer)
 
         SDL_RenderPresent(renderer);
     }
+
+#endif
+
 }
+
+
+#ifndef TIME_MEASURE
 
 static void pollAllSDLEvents(bool *setIsOn, CoordData *data)
 {
@@ -100,3 +145,26 @@ static void pollAllSDLEvents(bool *setIsOn, CoordData *data)
     }
 }
 
+#endif
+
+
+#ifdef TIME_MEASURE
+
+static inline uint64_t getProcessorTime()
+{
+
+    asm volatile 
+    (
+        "xor %%rax, %%rax\n\t"
+        "rdtsc\n\t"
+        "shl $32, %%rdx\n\t"
+        "add %%rdx, %%rax\n\t"
+        : 
+        :
+        : "%rdx"
+    );
+
+    // writes the time to rax -> it is the return value
+}
+
+#endif

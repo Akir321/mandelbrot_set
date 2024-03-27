@@ -44,11 +44,11 @@ int quitSDL(SDL_Window **window, SDL_Renderer **renderer)
     assert(*window);
     assert(*renderer);
 
-    SDL_DestroyWindow(*window);
-    *window = NULL;
-
     SDL_DestroyRenderer(*renderer);
     *renderer = NULL;
+
+    SDL_DestroyWindow(*window);
+    *window = NULL;
 
     SDL_Quit();
 

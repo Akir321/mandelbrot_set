@@ -4,6 +4,8 @@
 
 #include "mandelbrot.h"
 
+#define BASELINE
+
 const int NumsInVector = 8;
 
 
@@ -59,6 +61,8 @@ static inline __m256i calculateNOf8Points(__m256 X0,  __m256 Y0)
 
     __m256i N = _mm256_setzero_si256();
 
+#ifndef BASELINE
+
     for (int n = 0; n < MaxPointN; n++)
     {
         __m256 x2 = _mm256_mul_ps(X, X);
@@ -77,6 +81,8 @@ static inline __m256i calculateNOf8Points(__m256 X0,  __m256 Y0)
         X = _mm256_add_ps(_mm256_sub_ps(x2, y2), X0);
         Y = _mm256_add_ps(_mm256_add_ps(xy, xy), Y0);
     }
+
+#endif
 
     return N;
 }
