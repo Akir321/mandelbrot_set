@@ -1,5 +1,6 @@
 
 #include <SDL2/SDL.h>
+#include <assert.h>
 
 
 #include "mandelbrot.h"
@@ -24,6 +25,9 @@ static inline void    print8Points(SDL_Renderer *renderer,
 
 void calculateSet(SDL_Renderer *renderer, const CoordData *data)
 {
+    assert(renderer);
+    assert(data);
+
     const __m256 _76543210 = _mm256_set_ps (7.f, 6.f, 5.f, 4.f, 
                                             3.f, 2.f, 1.f, 0.f);
 
@@ -93,6 +97,8 @@ static inline __m256i calculateNOf8Points(__m256 X0,  __m256 Y0)
 static inline void print8Points(SDL_Renderer *renderer,
                                 int x, int y, __m256i N)
 {
+    assert(renderer);
+
     __m256 I =  _mm256_mul_ps(
                               _mm256_sqrt_ps(_mm256_sqrt_ps( 
                               _mm256_div_ps (_mm256_cvtepi32_ps(N), NMaxes))) , _255);
