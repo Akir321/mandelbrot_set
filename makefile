@@ -17,20 +17,27 @@ OBJECTS = $(OBJ_DIR)main.o          \
 		  $(OBJ_DIR)mandelbrot.o    \
 		  #$(OBJ_DIR)html_logfile.o
 
+INCLUDE = $(SRC_DIR)mandelbrot.h
+
+SIMD    = $(OBJ_DIR)set_calc_simd.o
+
 		  
-all: mandelbrot
+all: mandelbrot_simd
 
-mandelbrot: $(OBJECTS)
-	$(CXX) -O3 $(OBJECTS) -o $@ -L/usr/lib -lSDL2
+mandelbrot_simd: $(OBJECTS) $(SIMD)
+	$(CXX) -O3   $(OBJECTS) $(SIMD) -o $@ -L/usr/lib -lSDL2
 
-$(OBJ_DIR)main.o:          $(SRC_DIR)main.cpp
+$(OBJ_DIR)set_calc_simd.o: $(SRC_DIR)set_calc_simd.cpp $(INCLUDE)
+	$(CXX) -c $< -o $@ $(CXX_FLAGS) -mavx2 
+
+$(OBJ_DIR)main.o:          $(SRC_DIR)main.cpp          $(INCLUDE)
 	$(CXX) -c $< -o $@ $(CXX_FLAGS)
 
 $(OBJ_DIR)work_with_SDL.o: $(SRC_DIR)work_with_SDL.cpp $(SRC_DIR)work_with_SDL.h
 	$(CXX) -c $< -o $@ $(CXX_FLAGS)
 
-$(OBJ_DIR)mandelbrot.o:    $(SRC_DIR)mandelbrot.cpp    $(SRC_DIR)mandelbrot.h
-	$(CXX) -c $< -o $@ $(CXX_FLAGS) -mavx2 -mf16c
+$(OBJ_DIR)mandelbrot.o:    $(SRC_DIR)mandelbrot.cpp    $(INCLUDE)
+	$(CXX) -c $< -o $@ $(CXX_FLAGS)
 
 $(OBJ_DIR)html_logfile.o:  $(SRC_DIR)html_logfile.cpp  $(SRC_DIR)html_logfile.h
 	$(CXX) -c $< -o $@ $(CXX_FLAGS)
