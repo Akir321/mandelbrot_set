@@ -5,7 +5,7 @@
 
 #include "mandelbrot.h"
 
-#define BASELINE
+#define BASELIN
 
 const int NumsInVector = 8;
 
@@ -13,6 +13,13 @@ const int NumsInVector = 8;
 const __m256 NMaxes = _mm256_set1_ps(MaxPointN);
 const __m256 r2Max  = _mm256_set1_ps(Radius2Max);
 const __m256 _255   = _mm256_set1_ps(255.f);
+
+
+const __m256 _76543210 = _mm256_set_ps (7.f, 6.f, 5.f, 4.f, 
+                                        3.f, 2.f, 1.f, 0.f);
+
+const __m256 dXes8     = _mm256_mul_ps (_mm256_set1_ps(dx), _76543210);
+
 
 
 void calculateSet(SDL_Renderer *renderer, const CoordData *data);
@@ -28,13 +35,7 @@ void calculateSet(SDL_Renderer *renderer, const CoordData *data)
     assert(renderer);
     assert(data);
 
-    const __m256 _76543210 = _mm256_set_ps (7.f, 6.f, 5.f, 4.f, 
-                                            3.f, 2.f, 1.f, 0.f);
-
-    const __m256 dXes8     = _mm256_mul_ps (_mm256_set1_ps(dx), _76543210);
-
-
-    float NumDxZoomed = NumsInVector * dx * data->zoomMult;
+    float NumDxZoomed = (float) NumsInVector * dx * data->zoomMult;
 
     for (int curY = 0; curY < WindowHeight; curY++)
     {
@@ -60,12 +61,12 @@ void calculateSet(SDL_Renderer *renderer, const CoordData *data)
 
 static inline __m256i calculateNOf8Points(__m256 X0,  __m256 Y0)
 {
-    __m256 X = X0;
-    __m256 Y = Y0;
-
     __m256i N = _mm256_setzero_si256();
 
 #ifndef BASELINE
+
+    __m256 X = X0;
+    __m256 Y = Y0;
 
     for (int n = 0; n < MaxPointN; n++)
     {
@@ -100,8 +101,8 @@ static inline void print8Points(SDL_Renderer *renderer,
     assert(renderer);
 
     __m256 I =  _mm256_mul_ps(
-                              _mm256_sqrt_ps(_mm256_sqrt_ps( 
-                              _mm256_div_ps (_mm256_cvtepi32_ps(N), NMaxes))) , _255);
+                              _mm256_sqrt_ps( 
+                              _mm256_div_ps (_mm256_cvtepi32_ps(N), NMaxes)) , _255);
     
     float *ptrI = (float *) &I;
     int   *ptrN = (int *)   &N;
