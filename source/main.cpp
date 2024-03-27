@@ -7,7 +7,7 @@ int main()
 {
     printf("Initialize Mandelbrot set\n");
 
-    printMandelbrotSet();
+    runMandelbrotSet();
 
     printf("Goodbye!\n");
 }

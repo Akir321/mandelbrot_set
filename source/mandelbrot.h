@@ -9,7 +9,7 @@ struct CoordData
 };
 
 
-int printMandelbrotSet(void);
+int runMandelbrotSet(void);
 
 
 #endif //__MANDELBROT_SET_H__

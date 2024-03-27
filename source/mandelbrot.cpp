@@ -7,14 +7,14 @@
 #include "mandelbrot.h"
 #include "html_logfile.h"
 
-const int WindowWidth  = 800;
-const int WindowHeight = 600;
+const int WindowWidth  = 1400;
+const int WindowHeight = 1000;
 
 const int MaxPointN    = 256;
 
 const int NumsInVector = 8;
 
-const float changeMult = 10.f;
+const float changeMult = 5.f;
 
 const float dx         = 1.f / WindowWidth;
 const float dy         = 1.f / WindowHeight;
@@ -41,15 +41,15 @@ static void calculateSet(SDL_Renderer *renderer, const CoordData *data);
 
 static void printSetToWindow(SDL_Window *window, SDL_Renderer *renderer);
 
+static void pollAllSDLEvents(bool *setIsOn, CoordData *data);
+
 static inline __m256i calculateNOf8Points(__m256 X0,  __m256 Y0);
 
 static inline void    print8Points(SDL_Renderer *renderer,
                                    int x, int y, __m256i N);
 
-static bool fIsZero(float a);
 
-
-int printMandelbrotSet()
+int runMandelbrotSet()
 {
     SDL_Window   *window   = NULL;
     SDL_Renderer *renderer = NULL;
@@ -75,38 +75,11 @@ static void printSetToWindow(SDL_Window *window, SDL_Renderer *renderer)
     data.shiftY    = 0;
     data.zoomMult  = 1.f;
 
-    bool repeat     = true;
-    SDL_Event event = {};
+    bool setIsOn    = true;
 
-    while (repeat)
+    while (setIsOn)
     {
-        while(SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_KEYDOWN)
-            {
-                switch(event.key.keysym.sym)
-                {
-                    case SDLK_ESCAPE:   repeat         = false;    break;
-
-                    case SDLK_UP:       data.shiftY   -= dChangeY; break;
-
-                    case SDLK_DOWN:     data.shiftY   += dChangeY; break;
-
-                    case SDLK_RIGHT:    data.shiftX   += dChangeX; break;
-
-                    case SDLK_LEFT:     data.shiftX   -= dChangeX; break;
-                                    
-                    case SDLK_z:        data.zoomMult -= dChangeX;
-                                        if (fIsZero(data.zoomMult)) 
-                                            data.zoomMult = dChangeX;
-                                                                   break;
-
-                    case SDLK_x:        data.zoomMult += dChangeX; break;
-
-                    default:                                       break;
-                }
-            }
-        }
+        pollAllSDLEvents(&setIsOn, &data);
 
         SDL_RenderClear(renderer);
 
@@ -116,9 +89,51 @@ static void printSetToWindow(SDL_Window *window, SDL_Renderer *renderer)
     }
 }
 
+static void pollAllSDLEvents(bool *setIsOn, CoordData *data)
+{
+    assert(data);
+
+    SDL_Event event = {};
+
+    while(SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_KEYDOWN)
+        {
+            switch(event.key.keysym.sym)
+            {
+                case SDLK_ESCAPE:   *setIsOn        = false;    break;
+
+                case SDLK_UP:       data->shiftY   -= dChangeY; break;
+
+                case SDLK_DOWN:     data->shiftY   += dChangeY; break;
+
+                case SDLK_RIGHT:    data->shiftX   += dChangeX; break;
+
+                case SDLK_LEFT:     data->shiftX   -= dChangeX; break;
+                                    
+                case SDLK_z:        if (data->zoomMult -  dChangeX > 0) 
+                                        data->zoomMult -= dChangeX;
+                                                                break;
+
+                case SDLK_x:        data->zoomMult += dChangeX; break;
+
+                case SDLK_r:        data->zoomMult = 1.f; 
+                                    data->shiftX = 0, data->shiftY = 0;
+                                                                break;
+
+                default:                                        break;
+            }
+        }
+    }
+}
+
 static void calculateSet(SDL_Renderer *renderer, const CoordData *data)
 {
-    const __m256 _76543210 = _mm256_set_ps (7.f, 6.f, 5.f, 4.f, 3.f, 2.f, 1.f, 0.f);
+    const __m256 _76543210 = _mm256_set_ps (7.f, 6.f, 5.f, 4.f, 
+                                            3.f, 2.f, 1.f, 0.f);
+
+    const __m256 dXes8     = _mm256_mul_ps (_mm256_set1_ps(dx), _76543210);
+
 
     float NumDxZoomed = NumsInVector * dx * data->zoomMult;
 
@@ -133,8 +148,7 @@ static void calculateSet(SDL_Renderer *renderer, const CoordData *data)
 
         for (int curX = 0; curX < WindowWidth; curX += NumsInVector, x0 += NumDxZoomed)
         {
-            __m256 X0 = _mm256_fmadd_ps(_mm256_set1_ps(dx), _76543210,
-                                        _mm256_set1_ps(x0));
+            __m256 X0 = _mm256_add_ps(dXes8, _mm256_set1_ps(x0));
 
             __m256 Y0 = _mm256_set1_ps(y0);
 
@@ -195,7 +209,7 @@ static inline void print8Points(SDL_Renderer *renderer,
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 
                                    SDL_ALPHA_OPAQUE);
         else                      
-            SDL_SetRenderDrawColor(renderer, (BYTE)(255 - c), (BYTE)(c%2 * 64), c,
+            SDL_SetRenderDrawColor(renderer, 0, (BYTE)(c%2 * 64), (BYTE)(c%2 * 64),
                                    SDL_ALPHA_OPAQUE);
 
         SDL_RenderDrawPoint(renderer, x + i, y);
@@ -203,8 +217,3 @@ static inline void print8Points(SDL_Renderer *renderer,
 }
 
 #undef BYTE
-
-static bool fIsZero(float a)
-{
-    return fabs(a) < epsilon;
-}

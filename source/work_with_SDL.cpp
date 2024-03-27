@@ -6,8 +6,6 @@
 #include "work_with_SDL.h"
 #include "html_logfile.h"
 
-const int MaxPointN = 256;
-
 #undef  LOG
 #define LOG(...) 
 
