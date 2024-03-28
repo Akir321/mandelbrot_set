@@ -40,7 +40,7 @@ void calculateSet(SDL_Renderer *renderer, const CoordData *data)
         float x0 = ( (            - WindowWidth  / 2.f) * dx ) * data->zoomMult +
                     CenterX + data->shiftX;
 
-        float y0 = ( ((float)curY - WindowHeight / 2.f) * dy ) * data->zoomMult +
+        float y0 = ( ((float)curY - WindowHeight / 2.f) * dx ) * data->zoomMult +
                     CenterY + data->shiftY;
 
 
