@@ -3,8 +3,6 @@
 
 #include "mandelbrot.h"
 
-#define BASELIN
-
 
 void calculateSet(SDL_Renderer *renderer, const CoordData *data);
 

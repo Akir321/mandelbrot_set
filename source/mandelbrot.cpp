@@ -14,9 +14,6 @@ const float dChangeX   = dx * changeMult;
 const float dChangeY   = dy * changeMult;
 
 
-#define TIME_MEASURE
-
-
 #ifdef TIME_MEASURE
 
 const int NumOfRuns = 250;

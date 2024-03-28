@@ -5,8 +5,6 @@
 
 #include "mandelbrot.h"
 
-#define BASELIN
-
 const int NumsInVector = 8;
 
 
